@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
@@ -11,9 +12,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 
+import samples.aalamir.customcalendar.CalendarView.GridItemContainer;
 
 public class MainActivity extends ActionBarActivity
 {
+	private static HashSet<Date> events;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -21,23 +24,36 @@ public class MainActivity extends ActionBarActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		HashSet<Date> events = new HashSet<>();
-		events.add(new Date());
+		events = new HashSet<>();
 
-		CalendarView cv = ((CalendarView)findViewById(R.id.calendar_view));
+		final CalendarView cv = ((CalendarView)findViewById(R.id.calendar_view));
 		cv.updateCalendar(events);
+
+		final TextView txt = (TextView)findViewById(R.id.textContainer);
 
 		// assign event handler
 		cv.setEventHandler(new CalendarView.EventHandler()
 		{
 			@Override
+			public void onDayShortPress(GridItemContainer gic){
+				//When user clicks on one of the grid
+				DateFormat df = SimpleDateFormat.getDateInstance();
+				txt.setText(df.format(gic.getDate()) + "    " + gic.isSelected() );
+
+			}
+
+			@Override
 			public void onDayLongPress(Date date)
 			{
 				// show returned day
-				DateFormat df = SimpleDateFormat.getDateInstance();
-				Toast.makeText(MainActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+				events.add(date);
+				Toast.makeText(MainActivity.this, "LONG PRESS", Toast.LENGTH_LONG).show();
 			}
 		});
+	}
+
+	public static HashSet<Date> getEvents(){
+		return MainActivity.events;
 	}
 
 	@Override
@@ -64,4 +80,10 @@ public class MainActivity extends ActionBarActivity
 
 		return super.onOptionsItemSelected(item);
 	}
+
+	/**
+     * Created by asus on 09/04/2017.
+     */
+
+
 }
